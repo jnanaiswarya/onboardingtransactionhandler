@@ -41,36 +41,54 @@ public class OnBoardingTransactionHandlerApplication {
         SpringApplication.run(OnBoardingTransactionHandlerApplication.class, args);
     }
 
-    @Bean
-    public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+    // @Bean
+    // public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
-        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+    //     TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 
-        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-                .loadTrustMaterial(null, acceptingTrustStrategy)
-                .build();
+    //     SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+    //             .loadTrustMaterial(null, acceptingTrustStrategy)
+    //             .build();
 
-        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+    //     SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
 
-        // ✅ Updated to use RequestConfig (timeout settings)
-        RequestConfig config = RequestConfig.custom()
-                .setConnectionRequestTimeout(300000)
-                .setConnectTimeout(300000)
-                .setSocketTimeout(300000)
-                .build();
+    //     // ✅ Updated to use RequestConfig (timeout settings)
+    //     RequestConfig config = RequestConfig.custom()
+    //             .setConnectionRequestTimeout(300000)
+    //             .setConnectTimeout(300000)
+    //             .setSocketTimeout(300000)
+    //             .build();
 
-        CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .setDefaultRequestConfig(config)
-                .setSSLSocketFactory(csf)
-                .build();
+    //     CloseableHttpClient httpClient = HttpClientBuilder.create()
+    //             .setDefaultRequestConfig(config)
+    //             .setSSLSocketFactory(csf)
+    //             .build();
 
-        HttpComponentsClientHttpRequestFactory requestFactory =
-                new HttpComponentsClientHttpRequestFactory();
+    //     HttpComponentsClientHttpRequestFactory requestFactory =
+    //             new HttpComponentsClientHttpRequestFactory();
 
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        OnBoardingTransactionHandlerApplication.restTemplate = restTemplate;
-        return restTemplate;
-    }
+    //     RestTemplate restTemplate = new RestTemplate(requestFactory);
+    //     OnBoardingTransactionHandlerApplication.restTemplate = restTemplate;
+    //     return restTemplate;
+    // }
+@Bean
+public RestTemplate restTemplate() {
+
+    RequestConfig config = RequestConfig.custom()
+            .setConnectionRequestTimeout(300000)
+            .setConnectTimeout(300000)
+            .setSocketTimeout(300000)
+            .build();
+
+    CloseableHttpClient httpClient = HttpClientBuilder.create()
+            .setDefaultRequestConfig(config)
+            .build();
+
+    HttpComponentsClientHttpRequestFactory requestFactory =
+            new HttpComponentsClientHttpRequestFactory(httpClient);
+
+    return new RestTemplate(requestFactory);
+}
 
     @Bean("jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
